@@ -1,0 +1,12 @@
+/product/app/MIUIThemeManager/lib u:object_r:system_file:s0
+/product/app/MIUIThemeManager/lib/arm64 u:object_r:system_file:s0
+/product/app/MIUIThemeManager/lib/arm64/libfastplayer\.so u:object_r:system_file:s0
+/product/app/MIUIThemeManager/lib/arm64/libmiffmpeg\.so u:object_r:system_file:s0
+/product/app/MIUIThemeManager/lib/arm64/libmiuidiffpatcher\.so u:object_r:system_file:s0
+/product/priv-app/MiuiMms/lib u:object_r:system_file:s0
+/product/priv-app/MiuiMms/lib/arm64 u:object_r:system_file:s0
+/product/priv-app/MiuiMms/lib/arm64/libloadSecretKey\.so u:object_r:system_file:s0
+/product/priv-app/MiuiMms/lib/arm64/libmiuidiffpatcher\.so u:object_r:system_file:s0
+/product/priv-app/MiuiMms/lib/arm64/libRcsStack\.so u:object_r:system_file:s0
+/product/priv-app/MiuiMms/lib/arm64/libxcrash\.so u:object_r:system_file:s0
+/product/priv-app/MiuiMms/lib/arm64/libxcrash_dumper\.so u:object_r:system_file:s0
