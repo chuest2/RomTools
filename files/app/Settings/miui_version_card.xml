@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="190dp">
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="10dp"
+        android:layout_marginStart="@dimen/card_margin_edge"
+        android:layout_marginEnd="@dimen/card_margin_edge"
+        app:cardBackgroundColor="#00FFFFFF"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="0dp"
+        app:strokeWidth="0dp">
+        <com.android.BlurBackgroundImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:foreground="#30000000"
+            android:scaleType="centerCrop" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="120dp"
+                android:layout_height="180dp"
+                android:layout_marginBottom="-20dp"
+                android:layout_alignParentBottom="true"
+                android:layout_marginEnd="25dp"
+                android:layout_alignParentEnd="true"
+                app:cardBackgroundColor="#00FFFFFF"
+                app:cardCornerRadius="15dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@android:color/white"
+                app:strokeWidth="5dp">
+                <com.declan.widget.PrefWallBlur
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop" />
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_marginVertical="15dp">
+                    <TextClock
+                        android:textSize="20sp"
+                        android:textColor="#FFFFFFFF"
+                        android:gravity="center|start"
+                        android:id="@id/clock_hour"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:format12Hour="hh:mm"
+                        android:format24Hour="HH:mm" />
+                    <TextClock
+                        android:textSize="14sp"
+                        android:textColor="#FFFFFFFF"
+                        android:gravity="center|start"
+                        android:id="@id/clock_minute"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="-4dp"
+                        android:layout_below="@id/clock_hour"
+                        android:format12Hour="dd/MM"
+                        android:format24Hour="dd/MM" />
+                    <TextClock
+                        android:textSize="14sp"
+                        android:textColor="#FFFFFFFF"
+                        android:gravity="center|start"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="-4dp"
+                        android:layout_below="@id/clock_minute"
+                        android:format12Hour="EEE"
+                        android:format24Hour="EEE" />
+                </RelativeLayout>
+            </com.google.android.material.card.MaterialCardView>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:layout_alignParentBottom="true">
+                <ImageView
+                    android:id="@id/miui_logo_view"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:scaleType="fitCenter"
+                    android:alpha="0.0" />
+                <TextView
+                    android:textSize="44dp"
+                    android:textColor="#FFFFFFFF"
+                    android:id="@id/layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="HyperOS"
+                    android:fontFamily="mipro-medium"
+                    style="@style/Miuix.AppCompat.TextAppearance.List.Secondary.Preference" />
+                <RelativeLayout
+                    android:orientation="vertical"
+                    android:id="@id/version_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="0dp"
+                    android:layout_below="@id/layout"
+                    android:alpha="0.0">
+                    <TextView
+                        android:textSize="0dp"
+                        android:textColor="#00FFFFFF"
+                        android:id="@id/miui_version_text"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:maxLines="1"
+                        android:fontFamily="mipro-medium"
+                        style="@style/Miuix.AppCompat.TextAppearance.List.Secondary.Preference" />
+                    <TextView
+                        android:textSize="14dp"
+                        android:textColor="#FFFFFFFF"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Modify By chuest "
+                        android:maxLines="2"
+                        android:fontFamily="mipro-medium"
+                        style="@style/Miuix.AppCompat.TextAppearance.List.Secondary.Preference" />
+                </RelativeLayout>
+                <TextView
+                    android:textSize="12dp"
+                    android:textColor="#BAFFFFFF"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Official Edition"
+                    android:maxLines="2"
+                    android:layout_below="@id/version_layout"
+                    android:fontFamily="mipro-medium"
+                    android:drawableTint="#BAFFFFFF"
+                    style="@style/Miuix.AppCompat.TextAppearance.List.Secondary.Preference" />
+            </RelativeLayout>
+        </RelativeLayout>
+    </androidx.cardview.widget.CardView>
+    <RelativeLayout
+        android:id="@id/update_hint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/my_device_update_btn_margin_bottom"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:alpha="0.0"
+        android:layout_marginStart="28dp"
+        android:layout_marginEnd="28dp">
+        <TextView
+            android:id="@id/update_hint_text"
+            android:scrollbars="none"
+            android:fadingEdge="none"
+            android:layout_width="336dp"
+            android:layout_height="50dp"
+            android:text="@string/device_miui_version_update"
+            android:includeFontPadding="false"
+            android:fallbackLineSpacing="false"
+            style="@style/Widget.Button.Primary" />
+    </RelativeLayout>
+</RelativeLayout>

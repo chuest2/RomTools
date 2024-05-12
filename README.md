@@ -1,7 +1,4 @@
 <div align="center">
-<a href="https://github.com/anuraghazra/github-readme-stats">
-  <img align="center" src="https://github-readme-stats.vercel.app/api?username=chuest2" />
-</a>
 <h1 align="center">HyperOS Rom Modify</h1>
 <img src="https://v2.jinrishici.com/one.svg?font-size=24&spacing=2&color=Black">
 </div>
@@ -11,6 +8,18 @@
 适用于 Xiaomi 14 ，机型代号 houji 。
 
 在 termux 中 clone 本项目，先执行 setup.sh 安装环境，再执行 start.sh <包名> 即可。
+
+> 雨霖铃
+>
+> 银屏黯淡，爱机沉眠，往事难延。
+> 曾映繁华万千，今却黯，泪湿衣袂。
+> 昔日欢声笑语，唯余寂寞拨心弦。
+> 只盼得，解锁新法，重逢旧梦再续缘。
+>
+> 谁知一别成永诀，空余恨，更新梦已远。
+> 纵使新机再得，也难舍，旧日缠绵。
+> 梦回往昔，那刻相逢笑语嫣然。
+> 待重逢愿其如初，共书新篇页。
 
 ## Changes
 

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:gravity="center_vertical"
+    android:layout_gravity="center_vertical"
+    android:orientation="vertical"
+    android:background="@android:color/transparent"
+    android:paddingTop="16dp"
+    android:paddingBottom="6dp"
+    android:clipChildren="false"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingHorizontal="18dp">
+    <RelativeLayout
+        android:gravity="center|start|top"
+        android:layout_gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="68dp">
+        <ImageView
+            android:id="@id/layout"
+            android:background="@drawable/user_avatar_bg"
+            android:padding="3dp"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@drawable/ic_storage"
+            android:tint="@android:color/white"
+            android:layout_marginStart="2dp"
+            android:backgroundTint="@android:color/system_accent1_400" />
+        <TextView
+            android:textAppearance="@style/Miuix.AppCompat.TextAppearance.PreferenceList"
+            android:textSize="16dp"
+            android:ellipsize="end"
+            android:id="@id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:maxLines="1"
+            android:layout_below="@id/layout" />
+    </RelativeLayout>
+    <LinearLayout
+        android:gravity="center_vertical"
+        android:layout_gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp">
+        <TextView
+            android:textAppearance="@style/Miuix.AppCompat.TextAppearance.List.Secondary.Preference"
+            android:textSize="14dp"
+            android:textColor="@color/my_device_info_item_summary_color"
+            android:ellipsize="marquee"
+            android:gravity="center|start"
+            android:layout_gravity="center_vertical"
+            android:id="@id/summary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:layout_weight="1.0" />
+        <androidx.appcompat.widget.AppCompatImageView
+            android:gravity="center"
+            android:layout_gravity="center|end"
+            android:id="@id/arrow_right"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/miuix_preference_item_padding_inner"
+            app:srcCompat="@drawable/miuix_appcompat_arrow_right" />
+    </LinearLayout>
+</LinearLayout>

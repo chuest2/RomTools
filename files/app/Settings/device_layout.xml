@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:clipChildren="true"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <com.android.settings.device.MiuiVersionCard
+        android:id="@id/miui_version_card_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <LinearLayout
+        android:orientation="vertical"
+        android:id="@id/device_basic_layout"
+        android:clipChildren="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/card_margin_edge"
+        android:layout_marginEnd="@dimen/card_margin_edge">
+        <LinearLayout
+            android:orientation="horizontal"
+            android:clipChildren="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.0"
+                android:layout_marginEnd="6dp"
+                app:cardBackgroundColor="#00FFFFFF"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
+                <com.android.settings.device.MiuiDeviceNameCard
+                    android:id="@id/device_name_card_view"
+                    android:background="@drawable/new_device_card_back_ground"
+                    android:paddingTop="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </androidx.cardview.widget.CardView>
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.0"
+                android:layout_marginStart="6dp"
+                app:cardBackgroundColor="#00FFFFFF"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
+                <com.android.settings.device.MiuiMemoryCard
+                    android:id="@id/device_memory_card_view"
+                    android:background="@drawable/new_device_card_back_ground"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </androidx.cardview.widget.CardView>
+        </LinearLayout>
+        <com.android.settings.device.MiuiGuaranteeCard
+            android:id="@id/device_guarantee_card_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <com.android.settings.device.MiuiDeviceBenefitsCard
+            android:id="@id/device_mall_card_view"
+            android:paddingBottom="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+</LinearLayout>

@@ -61,6 +61,9 @@ function main(){
     preventThemeRecovery
     personalAssistantPatch
     mmsVerificationCodeAutoCopy
+    powerKeeperPatch
+    settingsPatch
+    miuiSystemUIPatch
     modify
 
     repackErofsImg system
@@ -206,6 +209,10 @@ function removeSignVerify(){
     captureSmali="tmp/services/smali_classes2/com/android/server/policy/PhoneWindowManager.smali"
     sed -i '/^.method private getScreenshotChordLongPressDelay()J/,/^.end method/{//!d}' $captureSmali
     sed -i -e '/^.method private getScreenshotChordLongPressDelay()J/a\    .locals 4\n\n    const-wide/16 v0, 0x0\n\n    return-wide v0' $captureSmali
+
+    logAccessSmali="tmp/services/smali_classes2/com/android/server/logcat/LogcatManagerService.smali"
+    sed -i '/^.method onLogAccessRequested/,/^.end method/{//!d}' $logAccessSmali
+    sed -i -e '/^.method onLogAccessRequested/a\    .locals 5\n\n    return-void' $logAccessSmali
 
     rm -f system/system/system/framework/services.jar
     find system/system/system/framework/oat/arm64 -type f -name "services*" | xargs rm -f
@@ -361,83 +368,114 @@ function mmsVerificationCodeAutoCopy(){
 }
 
 function powerKeeperPatch(){
-    echo -e "$(date "+%m/%d %H:%M:%S") [${G}NOTICE${N}] Decompiling MiuiMms.apk"
-    java -jar ${rootPath}/bin/APKEditor.jar d -t raw -f -no-dex-debug -i product/product/priv-app/MiuiMms/MiuiMms.apk -o tmp/MiuiMms >/dev/null 2>&1
+    echo -e "$(date "+%m/%d %H:%M:%S") [${G}NOTICE${N}] Decompiling PowerKeeper.apk"
+    java -jar ${rootPath}/bin/APKEditor.jar d -t raw -f -no-dex-debug -i system/system/system/app/PowerKeeper/PowerKeeper.apk -o tmp/PowerKeeper >/dev/null 2>&1
 
-	targetLocalUpdateUtilsFile=$(find tmp/PowerKeeper/ -type f -name LocalUpdateUtils.smali)
+	targetUpdateSmali=$(find tmp/PowerKeeper/smali/classes*/com/miui/powerkeeper/cloudcontrol/ -type f -name 'LocalUpdateUtils.smali' 2>/dev/null | xargs grep -rl '.method public static startCloudSyncData' | sed 's/^\.\///' | sort)
+    sed -i '/^.method public static startCloudSyncData/,/^.end method/{//!d}' $targetUpdateSmali
+    sed -i -e '/^.method public static startCloudSyncData/a\    .locals 1\n\n    return-void' $targetUpdateSmali
 
-	if [ -f "$targetLocalUpdateUtilsFile" ];then
-		echo I: Target:$targetLocalUpdateUtilsFile
-		nextLine=$(cat $targetLocalUpdateUtilsFile |grep -A2 "method public static startCloudSyncData" |awk 'NR==2')
-		isHaveCloudSync=$(cat $targetLocalUpdateUtilsFile |grep startCloudSyncData)
-		if [ "$nextLine" != ".end method" -a "$isHaveCloudSync" != "" ];then
-			while true
-			do
-				nextLine=$(cat $targetLocalUpdateUtilsFile |grep -A2 "method public static startCloudSyncData" |awk 'NR==2')
-				isEnd=$(echo $nextLine |grep "end method")
-				if [ "$isEnd" = "" ];then
-					#echo I: Deleting $nextLine
-					sed -i '/method public static startCloudSyncData(Landroid\/content\/Context;Z)V/{n;d}' $targetLocalUpdateUtilsFile
-				else
-					break
-				fi
-			done
-		fi
-		sed -i -e '/^.method public static startCloudSyncData(Landroid\/content\/Context;Z)V/a\\n    .locals 1\n\n    return-void' $targetLocalUpdateUtilsFile
+	targetFrameSmali=$(find tmp/PowerKeeper/smali/classes*/com/miui/powerkeeper/statemachine/ -type f -name 'DisplayFrameSetting.smali' 2>/dev/null | xargs grep -rl '.method public setScreenEffect(II)V' | sed 's/^\.\///' | sort)
+	sed -i '/^.method public static isFeatureOn()Z/,/^.end method/{//!d}' $targetFrameSmali
+    sed -i -e '/^.method public static isFeatureOn()Z/a\    .locals 1\n\n    const\/4 v0, 0x0\n\n    return v0' $targetFrameSmali
+	sed -i '/^.method public setScreenEffect(II)V/,/^.end method/{//!d}' $targetFrameSmali
+    sed -i -e '/^.method public setScreenEffect(II)V/a\    .locals 1\n\n    return-void' $targetFrameSmali
 
-	fi
+    rm -f system/system/system/app/PowerKeeper/PowerKeeper.apk
+    rm -f system/system/system/app/PowerKeeper/oat/arm64/*
 
-	targetFrameFile=$(find tmp/PowerKeeper/ -type f -name DisplayFrameSetting.smali)
-	if [ -f "$targetFrameFile" ];then
-		echo I: Target:$targetFrameFile
-		nextLinei=$(cat $targetFrameFile |grep -A2 "method public static isFeatureOn" |awk 'NR==2')
-		isHaveFeatureOn=$(cat $targetFrameFile |grep isFeatureOn)
-		if [ "$nextLinei" != "" -a "$isHaveFeatureOn" != "" ];then
-			while true
-			do
-				nextLinei=$(cat $targetFrameFile |grep -A2 "method public static isFeatureOn" |awk 'NR==2')
-				isEnd=$(echo $nextLinei |grep "end method")
-				if [ "$isEnd" = "" ];then
-					#echo I: Deleting $nextLinei
-					sed -i '/method public static isFeatureOn()Z/{n;d}' $targetFrameFile
-				else
-					break
-				fi
-			done
-			sed -i -e '/^.method public static isFeatureOn()Z/a\\n    .locals 1\n\n    const\/4 v0, 0x0\n\n    return v0' $targetFrameFile
-		fi
+    echo -e "$(date "+%m/%d %H:%M:%S") [${G}NOTICE${N}] Rebuilding PowerKeeper.apk"
+    java -jar ${rootPath}/bin/APKEditor.jar b -f -i tmp/PowerKeeper -o tmp/PowerKeeper.apk >/dev/null 2>&1
+    zipalign 4 tmp/PowerKeeper.apk system/system/system/app/PowerKeeper/PowerKeeper.apk
+    ${rootPath}/bin/dex2oat --dex-file=system/system/system/app/PowerKeeper/PowerKeeper.apk --instruction-set=arm64 --compiler-filter=speed --oat-file=system/system/system/app/PowerKeeper/oat/arm64/PowerKeeper.odex
+    rm -rf tmp
+}
 
-		nextLinej=$(cat $targetFrameFile |grep -A2 "method public setScreenEffect" |awk 'NR==2')
-		isHaveScreenEffect=$(cat $targetFrameFile |grep setScreenEffect)
-		if [ "$nextLinej" != "" -a "$isHaveScreenEffect" != "" ];then
-			while true
-			do
-				nextLinej=$(cat $targetFrameFile |grep -A2 "method public setScreenEffect" |awk 'NR==2')
-				isEnd=$(echo $nextLinej |grep "end method")
-				if [ "$isEnd" = "" ];then
-					#echo I: Deleting $nextLinej
-					sed -i '/method public setScreenEffect(II)V/{n;d}' $targetFrameFile
-				else
-					break
-				fi
-			done
+function settingsPatch(){
+    echo -e "$(date "+%m/%d %H:%M:%S") [${G}NOTICE${N}] Decompiling Settings.apk"
+    java -jar ${rootPath}/bin/APKEditor.jar d -t xml -f -no-dex-debug -i system_ext/system_ext/priv-app/Settings/Settings.apk -o tmp/Settings >/dev/null 2>&1
 
-			sed -i -e '/^.method public setScreenEffect(II)V/a\\n    .locals 1\n\n    return-void' $targetFrameFile
-		fi
-	fi
+    cp -rf ${rootPath}/files/app/Settings/com/ tmp/Settings/smali/classes/
+    cp -f ${rootPath}/files/app/Settings/device_layout.xml tmp/Settings/resources/package_1/res/layout/
+    cp -f ${rootPath}/files/app/Settings/miui_version_card.xml tmp/Settings/resources/package_1/res/layout/
+    cp -f ${rootPath}/files/app/Settings/my_device_info_item.xml tmp/Settings/resources/package_1/res/layout/
+    cp -f ${rootPath}/files/app/Settings/my_device_info_item2.xml tmp/Settings/resources/package_1/res/layout/
 
-    rm -f product/product/priv-app/MiuiMms/MiuiMms.apk
-    rm -f product/product/priv-app/MiuiMms/oat/arm64/*
+    publicFile="tmp/Settings/resources/package_1/res/values/public.xml"
+    findCode='type="layout" name="zone_picker_item"'
+    lineNum=$(grep -n "$findCode" "$publicFile" | cut -d ':' -f 1)
+    id=$(awk -v LN="$lineNum" 'NR==LN {print $2}' "$publicFile" | cut -d '"' -f 2)
+    nextId=$(printf "0x%x" "$(( $id + 1 ))")
+    replace="  <public id=\"${nextId}\" type=\"layout\" name=\"my_device_info_item2\" />"
+    sed -i "${lineNum}i\\${replace}" "$publicFile"
 
-    echo -e "$(date "+%m/%d %H:%M:%S") [${G}NOTICE${N}] Rebuilding MiuiMms.apk"
-    java -jar ${rootPath}/bin/APKEditor.jar b -f -i tmp/MiuiMms -o tmp/MiuiMms.apk >/dev/null 2>&1
-    zipalign 4 tmp/MiuiMms.apk product/product/priv-app/MiuiMms/MiuiMms.apk
-    ${rootPath}/bin/dex2oat --dex-file=product/product/priv-app/MiuiMms/MiuiMms.apk --instruction-set=arm64 --compiler-filter=speed --oat-file=product/product/priv-app/MiuiMms/oat/arm64/MiuiMms.odex
+    layoutSmali=$(find tmp/Settings/smali/classes*/com/android/settings/ -type f -name '*.smali' 2>/dev/null | xargs grep -rl '.field public static final my_device_info_item' | sed 's/^\.\///' | sort)
+    sed -i -e "/^.field public static final my_device_info_item/a\    .field public static final my_device_info_item2:I = ${nextId}" $layoutSmali
+
+    memoryCardSmali=$(find tmp/Settings/smali/classes*/com/android/settings/device/ -type f -name 'MiuiMemoryCard.smali' 2>/dev/null | xargs grep -rl 'my_device_info_item' | sed 's/^\.\///' | sort)
+    sed -i 's/my_device_info_item/my_device_info_item2/g' $memoryCardSmali
+
+    basicInfoSmali=$(find tmp/Settings/smali/classes*/com/android/settings/device/ -type f -name 'DeviceBasicInfoPresenter.smali' 2>/dev/null | xargs grep -rl '.method private getLineNum()' | sed 's/^\.\///' | sort)
+    replace=$(<${rootPath}/files/app/Settings/basicInfoReplace.smali)
+    sed -i '/^.method private getLineNum()/,/^.end method/{//!d}' $basicInfoSmali
+    printf '%s\n' "$replace" | sed -i '/^.method private getLineNum()/r /dev/stdin' "$basicInfoSmali"
+
+    arraysFile="tmp/Settings/resources/package_1/res/values/arrays.xml"
+    sed -i '/<item>@string\/display_notification_icon_3<\/item>/a\    <item>@string\/display_notification_icon_3<\/item>\n    <item>@string\/display_notification_icon_3<\/item>' $arraysFile
+    sed -i '/<string-array name="notification_icon_counts_values">/,/<\/string-array>/ {
+        /<item>3<\/item>/ {
+            a\
+        <item>5<\/item>
+            a\
+        <item>7<\/item>
+        }
+    }' $arraysFile
+
+    notificationSmali="tmp/Settings/smali/classes2/com/android/settings/NotificationStatusBarSettings.smali"
+    sed -i '/filled-new-array {v1, v2, v0}/i\    const/4 v3, 0x5\n\n    const/4 v4, 0x7\n' $notificationSmali
+    sed -i 's/filled-new-array {v1, v2, v0}/filled-new-array {v1, v2, v0, v3, v4}/g' $notificationSmali
+
+    aboutPhoneSmali=$(find tmp/Settings/smali/classes*/com/android/settings/device/ -type f -name 'MiuiAboutPhoneUtils.smali' 2>/dev/null | xargs grep -rl '.method public static isLocalCnAndChinese()Z' | sed 's/^\.\///' | sort)
+    sed -i '/^.method public static isLocalCnAndChinese()Z/,/^.end method/{//!d}' $aboutPhoneSmali
+    sed -i -e '/^.method public static isLocalCnAndChinese()Z/a\    .registers 2\n\n    const/4 v0, 0x0\n\n    return v0' $aboutPhoneSmali
+
+    featureSmali=$(find tmp/Settings/smali/classes*/com/android/settings/utils/ -type f -name 'SettingsFeatures.smali' 2>/dev/null | xargs grep -rl '.method public static isNeedHideShopEntrance' | sed 's/^\.\///' | sort)
+    sed -i '/^.method public static isNeedHideShopEntrance/,/^.end method/{//!d}' $featureSmali
+    sed -i -e '/^.method public static isNeedHideShopEntrance/a\    .registers 3\n\n    const/4 v0, 0x1\n\n    return v0' $featureSmali
+
+    miuiSettingsSmali=$(find tmp/Settings/smali/classes*/com/android/settings/ -type f -name 'MiuiSettings.smali' 2>/dev/null | xargs grep -rl 'sget-boolean v0, Lmiui/os/Build;->IS_GLOBAL_BUILD:Z' | sed 's/^\.\///' | sort)
+    sed -i 's/sget-boolean v0, Lmiui\/os\/Build;->IS_GLOBAL_BUILD:Z/const\/4 v0, 0x1/g' $miuiSettingsSmali
+
+    rm -f system_ext/system_ext/priv-app/Settings/Settings.apk
+    rm -f system_ext/system_ext/priv-app/Settings/oat/arm64/*
+
+    echo -e "$(date "+%m/%d %H:%M:%S") [${G}NOTICE${N}] Rebuilding Settings.apk"
+    java -jar ${rootPath}/bin/APKEditor.jar b -f -i tmp/Settings -o tmp/Settings.apk >/dev/null 2>&1
+    zipalign 4 tmp/Settings.apk system_ext/system_ext/priv-app/Settings/Settings.apk
+    ${rootPath}/bin/dex2oat --dex-file=system_ext/system_ext/priv-app/Settings/Settings.apk --instruction-set=arm64 --compiler-filter=speed --oat-file=system_ext/system_ext/priv-app/Settings/oat/arm64/Settings.odex
+    rm -rf tmp
+
+}
+
+function miuiSystemUIPatch(){
+    echo -e "$(date "+%m/%d %H:%M:%S") [${G}NOTICE${N}] Decompiling MiuiSystemUI.apk"
+    java -jar ${rootPath}/bin/APKEditor.jar d -t raw -f -no-dex-debug -i system_ext/system_ext/priv-app/MiuiSystemUI/MiuiSystemUI.apk -o tmp/MiuiSystemUI >/dev/null 2>&1
+
+    targetArg='0x3e8' # 1s
+	targetSpeedFile=$(find tmp/MiuiSystemUI/smali/classes*/com/android/systemui/statusbar/policy/ -type f -name 'NetworkSpeedController*.smali' 2>/dev/null | xargs grep -rl 'const-wide/16 v0, 0xfa0' | sed 's/^\.\///' | sort)
+	sed -i "s/const-wide\/16 v0, 0xfa0/const-wide\/16 v0, $targetArg/" $targetSpeedFile
+
+    rm -f system_ext/system_ext/priv-app/MiuiSystemUI/MiuiSystemUI.apk
+    rm -f system_ext/system_ext/priv-app/MiuiSystemUI/oat/arm64/*
+
+    echo -e "$(date "+%m/%d %H:%M:%S") [${G}NOTICE${N}] Rebuilding MiuiSystemUI.apk"
+    java -jar ${rootPath}/bin/APKEditor.jar b -f -i tmp/MiuiSystemUI -o tmp/MiuiSystemUI.apk >/dev/null 2>&1
+    zipalign 4 tmp/MiuiSystemUI.apk system_ext/system_ext/priv-app/MiuiSystemUI/MiuiSystemUI.apk
+    ${rootPath}/bin/dex2oat --dex-file=system_ext/system_ext/priv-app/MiuiSystemUI/MiuiSystemUI.apk --instruction-set=arm64 --compiler-filter=speed --oat-file=system_ext/system_ext/priv-app/MiuiSystemUI/oat/arm64/MiuiSystemUI.odex
     rm -rf tmp
 }
 
 function modify(){
-
     # sh -c "cat ${rootPath}/files/config/productConfigAdd >> product/config/product_fs_config"
     # sh -c "cat ${rootPath}/files/config/productContextAdd >> product/config/product_file_contexts"
 
@@ -448,7 +486,6 @@ function modify(){
     sed -i 's/<bool name=\"support_dolby\">false<\/bool>/<bool name=\"support_dolby\">true<\/bool>/g' product/product/etc/device_features/*.xml
     sed -i 's/<bool name=\"support_video_hfr_mode\">false<\/bool>/<bool name=\"support_video_hfr_mode\">true<\/bool>/g' product/product/etc/device_features/*.xml
     sed -i 's/<bool name=\"support_hifi\">false<\/bool>/<bool name=\"support_hifi\">true<\/bool>/g' product/product/etc/device_features/*.xml
-
 }
 
 function removeFiles(){
@@ -466,7 +503,7 @@ function replaceCust(){
 }
 
 function kernelsuPatch(){
-    echo -e "$(date "+%m/%d %H:%M:%S") [${G}NOTICE${N}] Patching init_boot image by KernelSu"
+    echo -e "$(date "+%m/%d %H:%M:%S") [${G}NOTICE${N}] Patching init_boot image using KernelSu"
 
     mv images/init_boot.img init_boot.img
     outputImg=$(${rootPath}/bin/ksud boot-patch -b init_boot.img --kmi android14-6.1 --magiskboot ${rootPath}/bin/magiskboot | grep -A 1 'Output file is written to' | sed -n '2p' | grep -Eo '/.+$')
@@ -475,7 +512,7 @@ function kernelsuPatch(){
 
 function apatchPatch(){
 
-    echo -e "$(date "+%m/%d %H:%M:%S") [${G}NOTICE${N}] Patching boot image by Apatch"
+    echo -e "$(date "+%m/%d %H:%M:%S") [${G}NOTICE${N}] Patching boot image using Apatch"
     SUPERKEY=${1}
     mv images/boot.img boot.img
 
